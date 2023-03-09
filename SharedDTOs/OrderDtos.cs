@@ -21,6 +21,7 @@ public enum OrderStatusDto
 {
     Cancelled,
     Completed,
+    Pending,
     Shipped,
     Paid
 }
