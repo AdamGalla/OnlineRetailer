@@ -17,7 +17,7 @@ namespace OrderApi.Data
 
         public IEnumerable<Order> GetAllByCustomerId(int id)
         {
-            return db.Orders.Where(x => x.CustomerId == id).ToList();
+            return db.Orders.Include(o => o.OrderLine).Where(x => x.CustomerId == id).ToList();
         }
 
         Order IRepository<Order>.Add(Order entity)
@@ -38,7 +38,7 @@ namespace OrderApi.Data
 
         Order IRepository<Order>.Get(int id)
         {
-            return db.Orders.FirstOrDefault(o => o.Id == id);
+            return db.Orders.Include(o => o.OrderLine).FirstOrDefault(o => o.Id == id);
         }
 
         IEnumerable<Order> IRepository<Order>.GetAll()
