@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using SharedDTOs;
 using OrderApi.Data;
 using OrderApi.Models;
 using RestSharp;
@@ -68,7 +67,7 @@ namespace OrderApi.Controllers
                 {
                     RestClient c = new RestClient("http://productapi/Products/");
                     var request = new RestRequest(orderLine.ProductId.ToString());
-                    var response = c.GetAsync<Product>(request);
+                    var response = c.GetAsync<ProductDto>(request);
                     response.Wait();
                     var orderedProduct = response.Result;
 

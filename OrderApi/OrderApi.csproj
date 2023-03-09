@@ -22,4 +22,7 @@
   <ItemGroup>
     <None Remove="Swashbuckle.AspNetCore" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SharedDTOs\SharedDTOs.csproj" />
+  </ItemGroup>
 </Project>

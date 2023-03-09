@@ -1,15 +1,15 @@
-﻿namespace OrderApi.Models;
+﻿namespace SharedDTOs;
 
-public class Order
+public class OrderDto
 {
     public int Id { get; set; }
     public int CustomerId { get; set; }
     public DateTime? Date { get; set; }
-    public OrderStatus Status { get; set; }
-    public ICollection<OrderLine> OrderLine { get; set; }
+    public OrderStatusDto Status { get; set; }
+    public ICollection<OrderLineDto> OrderLine { get; set; }
 }
 
-public class OrderLine
+public class OrderLineDto
 {
     public int Id { get; set; }
     public int OrderId { get; set; }
@@ -17,7 +17,7 @@ public class OrderLine
     public int ProductId { get; set; }
 }
 
-public enum OrderStatus
+public enum OrderStatusDto
 {
     Cancelled,
     Completed,
