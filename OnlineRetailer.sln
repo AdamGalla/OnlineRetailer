@@ -8,14 +8,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderApi", "OrderApi\OrderA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomerApi", "CustomerApi\CustomerApi.csproj", "{EB082249-3F11-4326-B2BE-34AAC47A29C5}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{EE23DF3A-57C0-42A9-AB61-D314F3AC23FF}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6E32A75-C92A-4D8F-BBC5-977683425C82}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedDTOs", "SharedDTOs\SharedDTOs.csproj", "{502FC932-CC18-4C7F-ADD1-B9B64ED49FF6}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{4C11A4E9-CBEB-441B-8240-B2E1DB5CE197}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,14 +35,14 @@ Global
 		{EB082249-3F11-4326-B2BE-34AAC47A29C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB082249-3F11-4326-B2BE-34AAC47A29C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB082249-3F11-4326-B2BE-34AAC47A29C5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EE23DF3A-57C0-42A9-AB61-D314F3AC23FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EE23DF3A-57C0-42A9-AB61-D314F3AC23FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EE23DF3A-57C0-42A9-AB61-D314F3AC23FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EE23DF3A-57C0-42A9-AB61-D314F3AC23FF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{502FC932-CC18-4C7F-ADD1-B9B64ED49FF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{502FC932-CC18-4C7F-ADD1-B9B64ED49FF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{502FC932-CC18-4C7F-ADD1-B9B64ED49FF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{502FC932-CC18-4C7F-ADD1-B9B64ED49FF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C11A4E9-CBEB-441B-8240-B2E1DB5CE197}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C11A4E9-CBEB-441B-8240-B2E1DB5CE197}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C11A4E9-CBEB-441B-8240-B2E1DB5CE197}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C11A4E9-CBEB-441B-8240-B2E1DB5CE197}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
