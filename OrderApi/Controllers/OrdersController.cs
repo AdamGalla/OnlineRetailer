@@ -57,17 +57,25 @@ namespace OrderApi.Controllers
             }
             bool isSucess = true;
             
+            RestClient client = new RestClient("http://customerapi/Customers/");
+            var customerResponse = client.GetAsync<CustomerDto>(new RestRequest(order.CustomerId.ToString()));
+            customerResponse.Wait();
+            if (!customerResponse.IsCompletedSuccessfully || customerResponse.Result == null || customerResponse.Result.Id != order.CustomerId)
+            {
+                return BadRequest("Customer with the given id does not exist!");
+            }
 
             // Call ProductApi to get the product ordered
             // You may need to change the port number in the BaseUrl below
             // before you can run the request.
+            client = new RestClient("http://productapi/Products/");
             foreach (var orderLine in order.OrderLine) 
             {
                 try 
                 {
-                    RestClient c = new RestClient("http://productapi/Products/");
+                    // Check if product has enough items in stock
                     var request = new RestRequest(orderLine.ProductId.ToString());
-                    var response = c.GetAsync<ProductDto>(request);
+                    var response = client.GetAsync<ProductDto>(request);
                     response.Wait();
                     var orderedProduct = response.Result;
 
@@ -78,7 +86,7 @@ namespace OrderApi.Controllers
                         orderedProduct.ItemsReserved += orderLine.Quantity;
                         var updateRequest = new RestRequest(orderedProduct.Id.ToString());
                         updateRequest.AddJsonBody(orderedProduct);
-                        var updateResponse = c.PutAsync(updateRequest);
+                        var updateResponse = client.PutAsync(updateRequest);
                         updateResponse.Wait();
                     }
                     else
@@ -86,7 +94,6 @@ namespace OrderApi.Controllers
                         return BadRequest("Order product quantity exceeded the available product quantity");
                     }
                 }
-
                 catch(Exception ex) 
                 {
                     isSucess = false;
