@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
 using CustomerApi.Models;
 
 namespace CustomerApi.Data;
@@ -30,7 +28,7 @@ public class CustomerRepository : IRepository<Customer>
 
     Customer IRepository<Customer>.Get(int id)
     {
-        return db.Customers.FirstOrDefault(p => p.Id == id);
+        return db.Customers.FirstOrDefault(p => p.Id == id)!;
     }
 
     IEnumerable<Customer> IRepository<Customer>.GetAll()
@@ -41,7 +39,10 @@ public class CustomerRepository : IRepository<Customer>
     void IRepository<Customer>.Remove(int id)
     {
         var customer = db.Customers.FirstOrDefault(p => p.Id == id);
-        db.Customers.Remove(customer);
-        db.SaveChanges();
+        if (customer != null)
+        {
+            db.Customers.Remove(customer);
+            db.SaveChanges();
+        }
     }
 }

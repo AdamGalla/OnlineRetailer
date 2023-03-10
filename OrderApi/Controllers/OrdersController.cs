@@ -97,7 +97,7 @@ namespace OrderApi.Controllers
                 catch(Exception ex) 
                 {
                     isSucess = false;
-                    return BadRequest("Something went wrong");
+                    return BadRequest($"Something went wrong {ex.GetType()}");
                 }
                 
 

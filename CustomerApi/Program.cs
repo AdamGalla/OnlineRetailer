@@ -44,7 +44,10 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var dbContext = services.GetService<CustomerApiContext>();
     var dbInitializer = services.GetService<IDbInitializer>();
-    dbInitializer.Initialize(dbContext);
+    if(dbContext != null && dbInitializer != null)
+    {
+        dbInitializer.Initialize(dbContext);
+    }
 }
 
 app.UseAuthorization();

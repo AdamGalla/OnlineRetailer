@@ -6,7 +6,7 @@ public class OrderDto
     public int CustomerId { get; set; }
     public DateTime? Date { get; set; }
     public OrderStatusDto Status { get; set; }
-    public ICollection<OrderLineDto> OrderLine { get; set; }
+    public ICollection<OrderLineDto>? OrderLine { get; set; }
 }
 
 public class OrderLineDto
