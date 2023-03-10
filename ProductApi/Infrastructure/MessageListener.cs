@@ -26,14 +26,10 @@ public class MessageListener
         using (_bus = RabbitHutch.CreateBus(_connectionString))
         {
             // Add code to subscribe to other OrderStatusChanged events:
-            _bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiCompleted",
-                HandleOrderCompleted, x => x.WithTopic("completed"));
-            _bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiShipped",
-                HandleOrderShipped, x => x.WithTopic("shipped"));
-            _bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiCancelled",
-                HandleOrderCancelled, x => x.WithTopic("cancelled"));
-            _bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiPaid",
-                HandleOrderPaid, x => x.WithTopic("paid"));
+            _bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiCompleted", HandleOrderCompleted, x => x.WithTopic("completed"));
+            _bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiShipped", HandleOrderShipped, x => x.WithTopic("shipped"));
+            _bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiCancelled", HandleOrderCancelled, x => x.WithTopic("cancelled"));
+            _bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiPaid", HandleOrderPaid, x => x.WithTopic("paid"));
         }
 
         // Block the thread so that it will not exit and stop subscribing.
@@ -168,5 +164,4 @@ public class MessageListener
         }
         return true;
     }
-
 }

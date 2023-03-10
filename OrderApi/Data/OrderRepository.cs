@@ -35,7 +35,10 @@ public class OrderRepository : IRepository<Order>
 
     Order IRepository<Order>.Get(int id)
     {
-        return db.Orders.Include(o => o.OrderLine).FirstOrDefault(o => o.Id == id);
+        var order = db.Orders.Include(o => o.OrderLine).FirstOrDefault(o => o.Id == id);
+        db.Entry(order).Reload();
+        return order;
+
     }
 
     IEnumerable<Order> IRepository<Order>.GetAll()
