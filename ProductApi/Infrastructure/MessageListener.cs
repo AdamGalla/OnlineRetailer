@@ -1,5 +1,7 @@
 ﻿using EasyNetQ;
+using ProductApi.Data;
 using ProductApi.Models;
+using SharedDTOs.Models;
 
 namespace ProductApi.Infrastructure;
 
