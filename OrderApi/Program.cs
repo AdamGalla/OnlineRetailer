@@ -15,7 +15,7 @@ string cloudAMQPConnectionString =
     "host=rabbitmq";
 
 // Register repositories for dependency injection
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IRepository<Order>, OrderRepository>();
 
 // Register database initializer for dependency injection
 builder.Services.AddTransient<IDbInitializer, DbInitializer>();

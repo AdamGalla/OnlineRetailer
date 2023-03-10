@@ -11,11 +11,11 @@ namespace OrderApi.Controllers;
 [Route("[controller]")]
 public class OrdersController : ControllerBase
 {
-    private readonly IOrderRepository _repository;
+    private readonly IRepository<Order> _repository;
     private readonly IMessagePublisher _messagePublisher;
 
     public OrdersController(
-        IOrderRepository repos,
+        IRepository<Order> repos,
         IMessagePublisher publisher)
     {
         _repository = repos;

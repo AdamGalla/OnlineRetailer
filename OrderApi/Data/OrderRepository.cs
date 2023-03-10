@@ -3,7 +3,7 @@ using OrderApi.Models;
 
 namespace OrderApi.Data;
 
-public class OrderRepository : IOrderRepository
+public class OrderRepository : IRepository<Order>
 {
     private readonly OrderApiContext db;
 

@@ -26,9 +26,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-Task.Factory.StartNew(() =>
-    new MessageListener(app.Services, cloudAMQPConnectionString).Start());
-
 app.UseCors(options =>
 {
     options.AllowAnyOrigin();
@@ -54,6 +51,9 @@ using (var scope = app.Services.CreateScope())
     var dbInitializer = services.GetService<IDbInitializer>();
     dbInitializer.Initialize(dbContext);
 }
+
+Task.Factory.StartNew(() =>
+    new MessageListener(app.Services, cloudAMQPConnectionString).Start());
 
 app.UseAuthorization();
 
