@@ -2,6 +2,7 @@
 using ProductApi.Data;
 using ProductApi.Models;
 using SharedDTOs.Models;
+using SharedDTOs;
 
 namespace ProductApi.Infrastructure;
 
@@ -55,23 +56,39 @@ public class MessageListener
 
         // Reserve items of ordered product (should be a single transaction).
         // Beware that this operation is not idempotent.
-        try
+        if (ProductItemsAvailable(message.OrderLines, productRepos)) 
         {
-            foreach (var orderLine in message.OrderLines)
+            try
             {
-                var product = productRepos.Get(orderLine.ProductId);
-                product.ItemsReserved += orderLine.Quantity;
-                productRepos.Edit(product);
-            }
-            var replyMessage = new OrderAcceptedMessage
-            {
-                OrderId = message.OrderId
-            };
+                foreach (var orderLine in message.OrderLines)
+                {
+                    var product = productRepos.Get(orderLine.ProductId);
+                    product.ItemsReserved += orderLine.Quantity;
+                    productRepos.Edit(product);
+                }
 
-            _bus.PubSub.Publish(replyMessage);
+                var replyMessage = new OrderAcceptedMessage
+                {
+                    OrderId = message.OrderId
+                };
+
+                _bus.PubSub.Publish(replyMessage);
+
+            }
+            catch
+            {
+                var replyMessage = new OrderRejectedMessage
+                {
+                    OrderId = message.OrderId
+                };
+
+                _bus.PubSub.Publish(replyMessage);
+
+                throw new Exception();
+            }
 
         }
-        catch
+        else
         {
             var replyMessage = new OrderRejectedMessage
             {
@@ -105,6 +122,7 @@ public class MessageListener
 
             }
         }
+
     }
 
     private void HandleOrderCancelled(OrderStatusChangedMessage message)
@@ -123,7 +141,6 @@ public class MessageListener
             var product = productRepos.Get(orderLine.ProductId);
             product.ItemsReserved -= orderLine.Quantity;
             productRepos.Edit(product);
-
         }
     }
     private void HandleOrderPaid(OrderStatusChangedMessage message)
@@ -138,4 +155,18 @@ public class MessageListener
         //TODO add logic if order has been paid
 
     }
+    
+    private bool ProductItemsAvailable(IList<OrderLineDto> orderLines, IRepository<Product> productRepos)
+    {
+        foreach (var orderLine in orderLines)
+        {
+            var product = productRepos.Get(orderLine.ProductId);
+            if (orderLine.Quantity > product.ItemsInStock - product.ItemsReserved)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
