@@ -8,6 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<OrderApiContext>(opt => opt.UseInMemoryDatabase("OrdersDb"));
 
+// RabbitMQ connection string (I use CloudAMQP as a RabbitMQ server).
+// Remember to replace this connectionstring with your own.
+string cloudAMQPConnectionString =
+    "host=rabbitmq";
+
 // Register repositories for dependency injection
 builder.Services.AddScoped<IRepository<Order>, OrderRepository>();
 

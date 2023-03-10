@@ -4,8 +4,12 @@ using ProductApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// RabbitMQ connection string (I use CloudAMQP as a RabbitMQ server).
+// Remember to replace this connectionstring with your own.
+string cloudAMQPConnectionString =
+    "host=rabbitmq";
 
+// Add services to the container.
 builder.Services.AddDbContext<ProductApiContext>(opt => opt.UseInMemoryDatabase("ProductsDb"));
 
 // Register repositories for dependency injection
