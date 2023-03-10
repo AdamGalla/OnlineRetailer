@@ -22,20 +22,17 @@ public class MessageListener
     public void Start()
     {
         using (var bus = RabbitHutch.CreateBus(connectionString))
-        {
+        {   
+            // Add code to subscribe to other OrderStatusChanged events:
             bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkCompleted",
                 HandleOrderCompleted, x => x.WithTopic("completed"));
-
-            // Add code to subscribe to other OrderStatusChanged events:
-            // * cancelled
-            // * shipped
-            // * paid
-            // Implement an event handler for each of these events.
-            // Be careful that each subscribe has a unique subscription id
-            // (this is the first parameter to the Subscribe method). If they
-            // get the same subscription id, they will listen on the same
-            // queue.
-
+            bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkShipped",
+                HandleOrderShipped, x => x.WithTopic("shipped"));
+            bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkCancelled",
+                HandleOrderCancelled, x => x.WithTopic("cancelled"));
+            bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkPaid",
+                HandleOrderPaid, x => x.WithTopic("paid"));
+            
             // Block the thread so that it will not exit and stop subscribing.
             lock (this)
             {
@@ -45,6 +42,7 @@ public class MessageListener
 
     }
 
+    // Implement an event handler for each of these events.
     private void HandleOrderCompleted(OrderStatusChangedMessage message)
     {
         // A service scope is created to get an instance of the product repository.
@@ -62,7 +60,67 @@ public class MessageListener
                 var product = productRepos.Get(orderLine.ProductId);
                 product.ItemsReserved += orderLine.Quantity;
                 productRepos.Edit(product);
+                
             }
+        }
+    }
+
+    private void HandleOrderShipped(OrderStatusChangedMessage message)
+    {
+        // A service scope is created to get an instance of the product repository.
+        // When the service scope is disposed, the product repository instance will
+        // also be disposed.
+        using (var scope = provider.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            var productRepos = services.GetService<IRepository<Product>>();
+
+            // Delete items of ordered product (should be a single transaction).
+            // Beware that this operation is not idempotent.
+            foreach (var orderLine in message.OrderLines)
+            {
+                var product = productRepos.Get(orderLine.ProductId);
+                product.ItemsReserved -= orderLine.Quantity;
+                product.ItemsInStock -= orderLine.Quantity;
+                productRepos.Edit(product);
+
+            }
+        }
+    }
+
+    private void HandleOrderCancelled(OrderStatusChangedMessage message)
+    {
+        // A service scope is created to get an instance of the product repository.
+        // When the service scope is disposed, the product repository instance will
+        // also be disposed.
+        using (var scope = provider.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            var productRepos = services.GetService<IRepository<Product>>();
+
+            // Delete items of ordered product (should be a single transaction).
+            // Beware that this operation is not idempotent.
+            foreach (var orderLine in message.OrderLines)
+            {
+                var product = productRepos.Get(orderLine.ProductId);
+                product.ItemsReserved -= orderLine.Quantity;
+                productRepos.Edit(product);
+
+            }
+        }
+    }
+    private void HandleOrderPaid(OrderStatusChangedMessage message)
+    {
+        // A service scope is created to get an instance of the product repository.
+        // When the service scope is disposed, the product repository instance will
+        // also be disposed.
+        using (var scope = provider.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            var productRepos = services.GetService<IRepository<Product>>();
+
+            //TODO add logic if order has been paid
+           
         }
     }
 }
