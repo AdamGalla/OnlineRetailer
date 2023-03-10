@@ -78,7 +78,7 @@ public class OrdersController : ControllerBase
             // Publish OrderStatusChangedMessage. 
             _messagePublisher.PublishOrderStatusChangedMessage
             (
-                newOrder.CustomerId, newOrder.OrderLine.ToList(), newOrder.Id, "productApiCompleted"
+                newOrder.CustomerId, newOrder.OrderLine.ToList(), newOrder.Id, "completed"
             );
 
 
@@ -106,9 +106,18 @@ public class OrdersController : ControllerBase
     [HttpPut("{id}/cancel")]
     public IActionResult Cancel(int id)
     {
-        throw new NotImplementedException();
-
-        // Add code to implement this method.
+        var order = _repository.Get(id);
+        if(order.Status != OrderStatus.Completed || order.Status != OrderStatus.Pending)
+        {
+            return BadRequest("Order could not be cancelled as the status was not 'pending' nor 'completed'.");
+        }
+        order.Status = OrderStatus.Cancelled;
+        _repository.Edit(order);
+        _messagePublisher.PublishOrderStatusChangedMessage
+        (
+            order.CustomerId, order.OrderLine.ToList(), order.Id, "cancelled"
+        );
+        return Ok(id);
     }
 
     // PUT orders/5/ship
@@ -117,9 +126,18 @@ public class OrdersController : ControllerBase
     [HttpPut("{id}/ship")]
     public IActionResult Ship(int id)
     {
-        throw new NotImplementedException();
-
-        // Add code to implement this method.
+        var order = _repository.Get(id);
+        if (order.Status != OrderStatus.Completed)
+        {
+            return BadRequest("Order could not be set to shipped as the status was not 'completed'.");
+        }
+        order.Status = OrderStatus.Shipped;
+        _repository.Edit(order);
+        _messagePublisher.PublishOrderStatusChangedMessage
+        (
+            order.CustomerId, order.OrderLine.ToList(), order.Id, "shipped"
+        );
+        return Ok(id);
     }
 
     // PUT orders/5/pay
@@ -128,8 +146,17 @@ public class OrdersController : ControllerBase
     [HttpPut("{id}/pay")]
     public IActionResult Pay(int id)
     {
-        throw new NotImplementedException();
-
-        // Add code to implement this method.
+        var order = _repository.Get(id);
+        if (order.Status != OrderStatus.Shipped)
+        {
+            return BadRequest("Order could not be set to paid as the status was not 'shipped'.");
+        }
+        order.Status = OrderStatus.Paid;
+        _repository.Edit(order);
+        _messagePublisher.PublishOrderStatusChangedMessage
+        (
+            order.CustomerId, order.OrderLine.ToList(), order.Id, "paid"
+        );
+        return Ok(id);
     }
 }
