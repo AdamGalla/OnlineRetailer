@@ -15,10 +15,10 @@ public class OrdersController : ControllerBase
     private readonly IMessagePublisher _messagePublisher;
 
     public OrdersController(
-        IRepository<Order> repos,
+        IOrderRepository repos,
         IMessagePublisher publisher)
     {
-        _repository = repos as IOrderRepository;
+        _repository = repos;
         _messagePublisher = publisher;
     }
 
