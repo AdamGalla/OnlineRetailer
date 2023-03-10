@@ -15,7 +15,7 @@ string cloudAMQPConnectionString =
     "host=rabbitmq";
 
 // Register repositories for dependency injection
-builder.Services.AddScoped<IRepository<Order>, OrderRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 // Register database initializer for dependency injection
 builder.Services.AddTransient<IDbInitializer, DbInitializer>();
@@ -28,9 +28,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
-Task.Factory.StartNew(() =>
-    new MessageListener(app.Services, cloudAMQPConnectionString).Start());
 
 app.UseCors(options =>
 {
@@ -57,6 +54,9 @@ using (var scope = app.Services.CreateScope())
     var dbInitializer = services.GetService<IDbInitializer>();
     dbInitializer.Initialize(dbContext);
 }
+
+Task.Factory.StartNew(() =>
+    new MessageListener(app.Services, cloudAMQPConnectionString).Start());
 
 app.UseAuthorization();
 
