@@ -3,6 +3,8 @@ using SharedDTOs;
 using OrderApi.Data;
 using OrderApi.Models;
 using RestSharp;
+using OrderApi.Messaging.Gateways;
+using OrderApi.Messaging;
 
 namespace OrderApi.Controllers
 {
@@ -11,10 +13,17 @@ namespace OrderApi.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IRepository<Order> repository;
+        private readonly IServiceGateway<ProductDto> _productServiceGateway;
+        private readonly IMessagePublisher _messagePublisher;
 
-        public OrdersController(IRepository<Order> repos)
+        public OrdersController(
+            IRepository<Order> repos,
+            IServiceGateway<ProductDto> gateway,
+            IMessagePublisher publisher)
         {
             repository = repos;
+            _productServiceGateway = gateway;
+            _messagePublisher = publisher;
         }
 
         // GET: orders
@@ -26,25 +35,25 @@ namespace OrderApi.Controllers
 
         // GET orders/5
         [HttpGet("{id}", Name = "GetOrder")]
-        public IActionResult Get(int id)
+        public ActionResult<Order> Get(int id)
         {
             var item = repository.Get(id);
             if (item == null)
             {
                 return NotFound();
             }
-            return new ObjectResult(item);
+            return new OkObjectResult(item);
         }
 
         [HttpGet("customer/{id}", Name = "GetAllByCustomerId")]
-        public IActionResult GetAllByCustomerId(int id)
+        public ActionResult<IEnumerable<Order>> GetAllByCustomerId(int id)
         {
             var item = repository.GetAllByCustomerId(id);
             if (item == null)
             {
                 return NotFound();
             }
-            return new ObjectResult(item);
+            return new OkObjectResult(item);
         }
 
         // POST orders
@@ -57,7 +66,7 @@ namespace OrderApi.Controllers
             }
             bool isSucess = true;
             
-            RestClient client = new RestClient("http://customerapi/Customers/");
+            var client = new RestClient("http://customerapi/Customers/");
             var customerResponse = client.GetAsync<CustomerDto>(new RestRequest(order.CustomerId.ToString()));
             customerResponse.Wait();
             if (!customerResponse.IsCompletedSuccessfully || customerResponse.Result == null || customerResponse.Result.Id != order.CustomerId)
