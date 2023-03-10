@@ -19,8 +19,3 @@ services:
     build:
       context: .
       dockerfile: CustomerApi/Dockerfile
-
-  rabbitmq:
-      image: rabbitmq:3-management
-      ports:
-      - "15673:15672"
