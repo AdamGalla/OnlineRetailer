@@ -21,16 +21,16 @@ public class MessagePublisher : IMessagePublisher, IDisposable
         _bus.Dispose();
     }
 
-    public void PublishOrderStatusChangedMessage(int? customerId, IList<OrderLine> orderLines, string topic)
+    public void PublishOrderStatusChangedMessage(int? customerId, IList<OrderLine> orderLines, int orderId, string topic)
     {
 
         var message = new OrderStatusChangedMessage
         {
             CustomerId = customerId,
+            OrderId = orderId,
             OrderLines = DTOConverter<OrderLine, OrderLineDto>.FromList(orderLines).ToList()
         };
 
         _bus.PubSub.Publish(message, topic);
     }
-
 }
