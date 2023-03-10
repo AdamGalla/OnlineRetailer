@@ -99,9 +99,6 @@ namespace OrderApi.Controllers
                     isSucess = false;
                     return BadRequest($"Something went wrong {ex.GetType()}");
                 }
-                
-
-                
             }
 
             if (isSucess)
@@ -112,8 +109,6 @@ namespace OrderApi.Controllers
             }
 
             return BadRequest("Order was not created try again later");
-            
         }
-
     }
 }
