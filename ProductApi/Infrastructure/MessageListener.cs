@@ -30,12 +30,13 @@ public class MessageListener
             _bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiShipped", HandleOrderShipped, x => x.WithTopic("shipped"));
             _bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiCancelled", HandleOrderCancelled, x => x.WithTopic("cancelled"));
             _bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiPaid", HandleOrderPaid, x => x.WithTopic("paid"));
-        }
 
-        // Block the thread so that it will not exit and stop subscribing.
-        lock (this)
-        {
-            Monitor.Wait(this);
+
+            // Block the thread so that it will not exit and stop subscribing.
+            lock (this)
+            {
+                Monitor.Wait(this);
+            }
         }
 
     }
