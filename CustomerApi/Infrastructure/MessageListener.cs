@@ -38,6 +38,7 @@ public class MessageListener
 
     private void HandleOrderCompleted(OrderStatusChangedMessage message)
     {
+        Console.WriteLine("Handling order completed " + message.OrderId);
         // A service scope is created to get an instance of the customer repository.
         // When the service scope is disposed, the customer repository instance will
         // also be disposed.
@@ -53,28 +54,29 @@ public class MessageListener
                 OrderId = message.OrderId
             };
             _bus.PubSub.Publish(replyMessage);
-
+            Console.WriteLine("Order rejected; no repo; " + message.OrderId);
             throw new Exception();
         }
 
         var customer = customerRepos.Get(message.CustomerId!.Value);
-        if (customer is null || !customer.CreditStanding)
+        if (customer is null || customer.CreditStanding)
         {
             var replyMessage = new OrderRejectedMessage
             {
                 OrderId = message.OrderId
             };
             _bus.PubSub.Publish(replyMessage);
-
+            Console.WriteLine($"Order rejected {message.OrderId} customer: {customer.Id} credits: {customer.CreditStanding}");
             throw new Exception();
         }
 
-        customer.CreditStanding = false;
+        customer.CreditStanding = true;
         var replyAcceptedMessage = new OrderAcceptedMessage
         {
             OrderId = message.OrderId
         };
         _bus.PubSub.Publish(replyAcceptedMessage);
+        Console.WriteLine("Order accepts " + message.OrderId);
         customerRepos.Edit(customer);
     }
 
@@ -88,7 +90,7 @@ public class MessageListener
         var customerRepos = services.GetService<IRepository<Customer>>();
 
         var customer = customerRepos.Get(message.CustomerId!.Value);
-        customer.CreditStanding = true;
+        customer.CreditStanding = false;
         customerRepos.Edit(customer);
     }
 
@@ -102,7 +104,7 @@ public class MessageListener
         var customerRepos = services.GetService<IRepository<Customer>>();
 
         var customer = customerRepos.Get(message.CustomerId!.Value);
-        customer.CreditStanding = true;
+        customer.CreditStanding = false;
         customerRepos.Edit(customer);
 
     }

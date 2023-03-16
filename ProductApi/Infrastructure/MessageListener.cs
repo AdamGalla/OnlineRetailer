@@ -43,6 +43,7 @@ public class MessageListener
     // Implement an event handler for each of these events.
     private void HandleOrderCompleted(OrderStatusChangedMessage message)
     {
+        Console.WriteLine("Handling order accept " + message.OrderId);
         // A service scope is created to get an instance of the product repository.
         // When the service scope is disposed, the product repository instance will
         // also be disposed.
@@ -67,7 +68,7 @@ public class MessageListener
                 {
                     OrderId = message.OrderId
                 };
-
+                Console.WriteLine("Order accepts " + message.OrderId);
                 _bus.PubSub.Publish(replyMessage);
 
             }
@@ -79,7 +80,7 @@ public class MessageListener
                 };
 
                 _bus.PubSub.Publish(replyMessage);
-
+                Console.WriteLine("Order rejects " + message.OrderId);
                 throw new Exception();
             }
 
@@ -91,7 +92,7 @@ public class MessageListener
                 OrderId = message.OrderId
             };
 
-
+            Console.WriteLine("Order rejects " + message.OrderId);
             _bus.PubSub.Publish(replyMessage);
         }
 

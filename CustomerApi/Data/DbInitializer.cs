@@ -21,7 +21,7 @@ public class DbInitializer : IDbInitializer
 
         List<Customer> customers = new List<Customer>
         {
-            new Customer { Name = "Adam", Email = "asdfg@gmail.com", Phone = "123456789", BillingAddress = "test", ShippingAddress = "test", CreditStanding = true }
+            new Customer { Name = "Adam", Email = "asdfg@gmail.com", Phone = "123456789", BillingAddress = "test", ShippingAddress = "test", CreditStanding = false }
         };
 
         context.Customers.AddRange(customers);

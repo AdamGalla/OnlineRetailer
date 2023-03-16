@@ -84,7 +84,7 @@ public class OrdersController : ControllerBase
             // Wait until order status is "completed"
             bool completed = false;
             int count = 0;
-            while (!completed || count < 500)
+            while (!completed || count < 50)
             {
                 var pendingOrder = _repository.Get(newOrder.Id);
                 if (pendingOrder.Status == OrderStatus.Completed)
@@ -93,16 +93,16 @@ public class OrdersController : ControllerBase
                 count++;
             }
 
-            if(!completed || count >= 500)
+            if(!completed)
             {
                 return StatusCode(500, "An error happened. Try again.");
             }
 
             return CreatedAtRoute("GetOrder", new { id = newOrder.Id }, newOrder);
         }
-        catch
+        catch(Exception ex)
         {
-            return StatusCode(500, "An error happened. Try again.");
+            return StatusCode(500, "An error happened. Try again. Message: " + ex.Message);
         }
     }
 
@@ -113,7 +113,7 @@ public class OrdersController : ControllerBase
     public IActionResult Cancel(int id)
     {
         var order = _repository.Get(id);
-        if(order.Status != OrderStatus.Completed || order.Status != OrderStatus.Pending)
+        if(order.Status != OrderStatus.Completed && order.Status != OrderStatus.Pending)
         {
             return BadRequest("Order could not be cancelled as the status was not 'pending' nor 'completed'.");
         }

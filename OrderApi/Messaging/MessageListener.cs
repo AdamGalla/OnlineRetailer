@@ -42,25 +42,35 @@ public class MessageListener
 
     private void HandleOrderAccepted(OrderAcceptedMessage message)
     {
+        Console.WriteLine("Accepted message for " + message.OrderId);
         using var scope = _provider.CreateScope();
         var services = scope.ServiceProvider;
         var orderRepos = services.GetService<IRepository<Order>>();
-
-        if(_orderAcceptedCount.TryGetValue(message.OrderId, out int currentValue))
+        try
         {
-            _orderAcceptedCount.Add(message.OrderId, currentValue++);
-            if(currentValue == 2)
+            if (_orderAcceptedCount.TryGetValue(message.OrderId, out int currentValue))
             {
-                _orderAcceptedCount.Remove(message.OrderId);
-                // Mark order as completed
-                var order = orderRepos.Get(message.OrderId);
-                order.Status = OrderStatus.Completed;
-                orderRepos.Edit(order);
+                currentValue++;
+                _orderAcceptedCount[message.OrderId] = currentValue;
+                Console.WriteLine($"{currentValue} Accept for {message.OrderId}");
+                if (currentValue == 2)
+                {
+                    _orderAcceptedCount.Remove(message.OrderId);
+                    // Mark order as completed
+                    var order = orderRepos.Get(message.OrderId);
+                    order.Status = OrderStatus.Completed;
+                    orderRepos.Edit(order);
+                }
+            }
+            else
+            {
+                Console.WriteLine("First accept for " + message.OrderId);
+                _orderAcceptedCount.Add(message.OrderId, 1);
             }
         }
-        else
+        catch(Exception ex)
         {
-            _orderAcceptedCount.Add(message.OrderId, 1);
+            Console.WriteLine($"Encountered Exception: {ex.Message}");
         }
     }
 
@@ -69,6 +79,8 @@ public class MessageListener
         using var scope = _provider.CreateScope();
         var services = scope.ServiceProvider;
         var orderRepos = services.GetService<IRepository<Order>>();
+
+        Console.WriteLine("Reject for " + message.OrderId);
 
         if (_orderAcceptedCount.ContainsKey(message.OrderId))
         {
