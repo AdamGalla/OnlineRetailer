@@ -61,13 +61,13 @@ public class OrdersController : ControllerBase
             return BadRequest();
         }
         
-        var client = new RestClient("http://customerapi/Customers/");
+        /*var client = new RestClient("http://customerapi/Customers/");
         var customerResponse = client.GetAsync<CustomerDto>(new RestRequest(order.CustomerId.ToString()));
         customerResponse.Wait();
         if (!customerResponse.IsCompletedSuccessfully || customerResponse.Result == null || customerResponse.Result.Id != order.CustomerId)
         {
             return BadRequest("Customer with the given id does not exist!");
-        }
+        }*/
 
         try
         {
@@ -81,15 +81,21 @@ public class OrdersController : ControllerBase
                 newOrder.CustomerId, newOrder.OrderLine.ToList(), newOrder.Id, "completed"
             );
 
-
             // Wait until order status is "completed"
             bool completed = false;
-            while (!completed)
+            int count = 0;
+            while (!completed || count < 500)
             {
                 var pendingOrder = _repository.Get(newOrder.Id);
                 if (pendingOrder.Status == OrderStatus.Completed)
                     completed = true;
                 Thread.Sleep(100);
+                count++;
+            }
+
+            if(!completed || count >= 500)
+            {
+                return StatusCode(500, "An error happened. Try again.");
             }
 
             return CreatedAtRoute("GetOrder", new { id = newOrder.Id }, newOrder);

@@ -1,9 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using CustomerApi.Data;
 using CustomerApi.Models;
+using CustomerApi.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
+
+string cloudAMQPConnectionString =
 
 builder.Services.AddDbContext<CustomerApiContext>(opt => opt.UseInMemoryDatabase("CustomerDb"));
 
@@ -49,6 +52,9 @@ using (var scope = app.Services.CreateScope())
         dbInitializer.Initialize(dbContext);
     }
 }
+
+Task.Factory.StartNew(() =>
+    new MessageListener(app.Services, cloudAMQPConnectionString).Start());
 
 app.UseAuthorization();
 

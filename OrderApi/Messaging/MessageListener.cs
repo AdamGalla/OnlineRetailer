@@ -11,6 +11,8 @@ public class MessageListener
     private readonly string _connectionString;
     private IBus _bus;
 
+    private Dictionary<int, int> _orderAcceptedCount;
+
     // The service _provider is passed as a parameter, because the class needs
     // access to the product repository. With the service _provider, we can create
     // a service scope that can provide an instance of the order repository.
@@ -18,6 +20,7 @@ public class MessageListener
     {
         _provider = provider;
         _connectionString = connectionString;
+        _orderAcceptedCount = new Dictionary<int, int>();
     }
 
     public void Start()
@@ -43,10 +46,22 @@ public class MessageListener
         var services = scope.ServiceProvider;
         var orderRepos = services.GetService<IRepository<Order>>();
 
-        // Mark order as completed
-        var order = orderRepos.Get(message.OrderId);
-        order.Status = OrderStatus.Completed;
-        orderRepos.Edit(order);
+        if(_orderAcceptedCount.TryGetValue(message.OrderId, out int currentValue))
+        {
+            _orderAcceptedCount.Add(message.OrderId, currentValue++);
+            if(currentValue == 2)
+            {
+                _orderAcceptedCount.Remove(message.OrderId);
+                // Mark order as completed
+                var order = orderRepos.Get(message.OrderId);
+                order.Status = OrderStatus.Completed;
+                orderRepos.Edit(order);
+            }
+        }
+        else
+        {
+            _orderAcceptedCount.Add(message.OrderId, 1);
+        }
     }
 
     private void HandleOrderRejected(OrderRejectedMessage message)
@@ -54,6 +69,11 @@ public class MessageListener
         using var scope = _provider.CreateScope();
         var services = scope.ServiceProvider;
         var orderRepos = services.GetService<IRepository<Order>>();
+
+        if (_orderAcceptedCount.ContainsKey(message.OrderId))
+        {
+            _orderAcceptedCount.Remove(message.OrderId);
+        }
 
         // Delete tentative order.
         orderRepos.Remove(message.OrderId);

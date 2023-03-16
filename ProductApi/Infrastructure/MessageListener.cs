@@ -38,7 +38,6 @@ public class MessageListener
                 Monitor.Wait(this);
             }
         }
-
     }
 
     // Implement an event handler for each of these events.
@@ -103,21 +102,19 @@ public class MessageListener
         // A service scope is created to get an instance of the product repository.
         // When the service scope is disposed, the product repository instance will
         // also be disposed.
-        using (var scope = _provider.CreateScope())
+        using var scope = _provider.CreateScope();
+        var services = scope.ServiceProvider;
+        var productRepos = services.GetService<IRepository<Product>>();
+
+        // Delete items of ordered product (should be a single transaction).
+        // Beware that this operation is not idempotent.
+        foreach (var orderLine in message.OrderLines)
         {
-            var services = scope.ServiceProvider;
-            var productRepos = services.GetService<IRepository<Product>>();
+            var product = productRepos.Get(orderLine.ProductId);
+            product.ItemsReserved -= orderLine.Quantity;
+            product.ItemsInStock -= orderLine.Quantity;
+            productRepos.Edit(product);
 
-            // Delete items of ordered product (should be a single transaction).
-            // Beware that this operation is not idempotent.
-            foreach (var orderLine in message.OrderLines)
-            {
-                var product = productRepos.Get(orderLine.ProductId);
-                product.ItemsReserved -= orderLine.Quantity;
-                product.ItemsInStock -= orderLine.Quantity;
-                productRepos.Edit(product);
-
-            }
         }
 
     }
@@ -149,7 +146,12 @@ public class MessageListener
         var services = scope.ServiceProvider;
         var productRepos = services.GetService<IRepository<Product>>();
 
-        //TODO add logic if order has been paid
+        //foreach (var orderLine in message.OrderLines)
+        //{
+        //    var product = productRepos.Get(orderLine.ProductId);
+        //    product.ItemsReserved -= orderLine.Quantity;
+        //    productRepos.Edit(product);
+        //}
 
     }
     

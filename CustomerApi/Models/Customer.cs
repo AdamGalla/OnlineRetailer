@@ -8,7 +8,7 @@
         public string? Phone { get; set; }
         public string? BillingAddress { get; set; }
         public string? ShippingAddress { get; set; }
-        public float CreditStanding { get; set; }
+        public bool CreditStanding { get; set; }
 
 
     }
