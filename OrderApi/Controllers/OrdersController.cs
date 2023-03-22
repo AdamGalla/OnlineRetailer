@@ -60,7 +60,7 @@ public class OrdersController : ControllerBase
         {
             return BadRequest();
         }
-        
+
         /*var client = new RestClient("http://customerapi/Customers/");
         var customerResponse = client.GetAsync<CustomerDto>(new RestRequest(order.CustomerId.ToString()));
         customerResponse.Wait();
@@ -95,6 +95,7 @@ public class OrdersController : ControllerBase
 
             if(!completed)
             {
+                _repository.Remove(newOrder.Id);
                 return StatusCode(500, "An error happened. Try again.");
             }
 
@@ -102,6 +103,10 @@ public class OrdersController : ControllerBase
         }
         catch(Exception ex)
         {
+            if(order != null)
+            {
+                _repository.Remove(order.Id);
+            }
             return StatusCode(500, "An error happened. Try again. Message: " + ex.Message);
         }
     }
